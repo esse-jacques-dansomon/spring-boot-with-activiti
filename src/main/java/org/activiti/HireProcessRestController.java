@@ -20,6 +20,15 @@ public class HireProcessRestController {
     @Autowired
     private ApplicantRepository applicantRepository;
 
+    @Autowired
+    private HistoryService historyService;
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private TaskService taskService;
+
     @ResponseStatus(value = HttpStatus.OK)
     @RequestMapping(value = "/start-hire-process", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,6 +51,22 @@ public class HireProcessRestController {
                 .processInstanceId(data.get("processInstanceId"))
                 .setVariable("email", data.get("email"))
                 .correlate();
+    }
+
+
+
+    public List<HistoricActivityInstance> getAllProcessSteps(String processInstanceId) {
+        return historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .orderByHistoricActivityInstanceStartTime()
+                .asc()
+                .list();
+    }
+
+    public List<Task> getActiveTasks(String processInstanceId) {
+        return taskService.createTaskQuery()
+                .processInstanceId(processInstanceId)
+                .list();
     }
 
 //    @ResponseStatus(value = HttpStatus.OK)
